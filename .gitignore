@@ -1,4 +1,8 @@
 # Windows
+
+.git/
+.gitignore
+coolgame
  
 # Windows thumbnail cache files
 Thumbs.db
