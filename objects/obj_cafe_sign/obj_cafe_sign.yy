@@ -28,8 +28,8 @@
   "resourceVersion":"2.0",
   "solid":false,
   "spriteId":{
-    "name":"cafe_sign",
-    "path":"sprites/cafe_sign/cafe_sign.yy",
+    "name":"spr_cafe_sign",
+    "path":"sprites/spr_cafe_sign/spr_cafe_sign.yy",
   },
   "spriteMaskId":null,
   "visible":true,

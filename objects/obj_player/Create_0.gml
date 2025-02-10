@@ -79,7 +79,7 @@ dodge_penalty = 0; // Penalty counter (increases with spam)
 dodge_recovery_rate = 0.1; // Rate of dodge recovery over time
 min_dodge_duration = 2; 
 min_dodge_speed = 2; 
-
+only_mirror =true;
 // Image speed settings
 image_speed_moving = 0.8;
 image_speed_idle = 0.3;
@@ -89,9 +89,11 @@ image_speed_attacking = 1;
 facing_direction = "down"; // Default to facing downward
 
 // Default full-body sprite
-sprite_full = character_idle_front; // Can be idle or running
+sprite_full = spr_character_idle_front; // Can be idle or running
 sprite_frozen = NaN;
 
+//hookshot
+hook_active = false;
 
 // Follower logic
 array_size = 94;

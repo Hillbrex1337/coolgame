@@ -16,7 +16,10 @@
     "name":"Objects",
     "path":"folders/Objects.yy",
   },
-  "parentObjectId":null,
+  "parentObjectId":{
+    "name":"obj_movable",
+    "path":"objects/obj_movable/obj_movable.yy",
+  },
   "persistent":false,
   "physicsAngularDamping":0.1,
   "physicsDensity":0.5,
@@ -35,8 +38,8 @@
   "resourceVersion":"2.0",
   "solid":false,
   "spriteId":{
-    "name":"character_idle_right",
-    "path":"sprites/character_idle_right/character_idle_right.yy",
+    "name":"spr_character_idle_right",
+    "path":"sprites/spr_character_idle_right/spr_character_idle_right.yy",
   },
   "spriteMaskId":null,
   "visible":true,

@@ -110,28 +110,28 @@ if (!frozen){
 	    // Set attack sprites based on facing direction
 	    switch (facing_direction) {
 	        case "left":
-				sprite_full = character_melee_left;
+				sprite_full = spr_character_melee_left;
 	            break;
 	        case "right":
-				sprite_full = character_melee_right;
+				sprite_full = spr_character_melee_right;
 	            break;
 	        case "up":
-	            sprite_full = character_melee_up;
+	            sprite_full = spr_haracter_melee_up;
 	            break;
 	        case "down":
-	            sprite_full = character_melee_down;
+	            sprite_full = spr_character_melee_down;
 	            break;
 			case "down_left":
-				sprite_full = character_melee_down_left;
+				sprite_full = spr_character_melee_down_left;
 	            break;
 			case "down_right":
-				sprite_full = character_melee_down_right;
+				sprite_full = spr_character_melee_down_right;
 	            break;
 			case "up_left":
-				sprite_full = character_melee_up_left;
+				sprite_full = spr_character_melee_up_left;
 	            break;
 			case "up_right":
-				sprite_full = character_melee_up_right;
+				sprite_full = spr_character_melee_up_right;
 	            break;
 	    }
 		atom_timer=0;
@@ -160,35 +160,35 @@ if (!frozen){
 			var snapped_angle = round(angle_to_mouse / 45) * 45;
 			switch (snapped_angle) {
 		        case 0:
-					sprite_full = character_melee_right;
+					sprite_full = spr_character_melee_right;
 					facing_direction = "right";
 		            break;
 		        case 45:
-					sprite_full = character_melee_up_right;
+					sprite_full = spr_character_melee_up_right;
 					facing_direction = "up_right";
 		            break;
 		        case 90:
-		            sprite_full = character_melee_up;
+		            sprite_full = spr_haracter_melee_up;
 					facing_direction = "up";
 		            break;
 		        case 135:
-		            sprite_full = character_melee_up_left;
+		            sprite_full = spr_character_melee_up_left;
 					facing_direction = "up_left";
 		            break;
 				case 180:
-					sprite_full = character_melee_left;
+					sprite_full = spr_character_melee_left;
 					facing_direction = "left";
 		            break;
 				case 225:
-					sprite_full = character_melee_down_left;
+					sprite_full = spr_character_melee_down_left;
 					facing_direction = "down_left";
 		            break;
 				case 270:
-					sprite_full = character_melee_down;
+					sprite_full = spr_character_melee_down;
 					facing_direction = "down";
 		            break;
 				case 315:
-					sprite_full = character_melee_down_right;
+					sprite_full = spr_character_melee_down_right;
 					facing_direction = "down_right";
 		            break;
 	    }
@@ -256,6 +256,39 @@ if (!frozen){
 	        case "down_left": dodge_x = -dodge_speed * 0.707; dodge_y = dodge_speed * 0.707; break;
 	    }
 	}
+	
+	if (keyboard_check_pressed(vk_space) && !hook_active) {
+	    /*show_debug_message("hooking!");
+	    hook_active = true;
+
+	    // Create the hookshot object at the player's position
+	    var hookshot = instance_create_layer(x, y, "Player", obj_hookshot);
+    
+	    // Ensure target_x and target_y are set before use
+	    hookshot.target_x = mouse_x;
+	    hookshot.target_y = mouse_y;
+
+	    // Pass player reference so the hookshot knows its owner
+	    hookshot.owner = id;
+		*/
+	    // Set movement direction and speed
+	    //hookshot.direction = point_direction(hookshot.x, hookshot.y, hookshot.target_x, hookshot.target_y);
+	    //hookshot.speed = 10; // ✅ This ensures movement starts
+	}
+	if (keyboard_check_pressed(ord("Q"))) {
+	    var beam = instance_create_layer(x, y, "Player", obj_tractor_beam);
+		beam.owner = id;
+		
+	}
+	if (keyboard_check_released(ord("Q"))) {
+	     var beam = instance_nearest(x, y, obj_tractor_beam);
+		 with(beam.hit){
+			 is_hit=false;
+		 }
+         instance_destroy(beam); // Destroy the hook after reaching
+	}
+
+
 }
 if(atom_spawned){
 	//show_debug_message("atom_index: " + string(atom_index));
@@ -340,10 +373,9 @@ if (attacking) {
     attack_timer++;
 	//move_speed = 3;
     // **Allow animation to play fully before stopping**
-	 show_debug_message("Animation reached frame " + string(image_index) + ", checking freeze...");
     if (floor(image_index) == 4 || floor(image_index) == 9 || floor(image_index) == 14) {
         
-        show_debug_message("Animation reached frame " + string(image_index) + ", freezing...");
+     
 
         image_speed = 0; // Stop animation at 1, 3, 5
     }
@@ -352,7 +384,6 @@ if (attacking) {
     if (attack_timer >= max_attack_timer) {
         attacking = false;
         attack_step = 0;
-        show_debug_message("ATTACK RESET due to timeout");
     }
 } else if (charging) {
 } else if (dodging) {
@@ -422,7 +453,7 @@ if (attacking) {
 
 	switch (facing_direction) {
 	    case "left":
-	        sprite_full = is_moving ? character_run_left : character_idle_left;
+	        sprite_full = is_moving ? spr_character_run_left : spr_character_idle_left;
 	        move_speed_left = is_moving ? increaseSpeed(move_speed_left) : decreaseSpeed(move_speed_left);
 	        move_speed_right = decreaseSpeed(move_speed_right);
 	        move_speed_up = decreaseSpeed(move_speed_up);
@@ -430,7 +461,7 @@ if (attacking) {
 	        break;
 
 	    case "right":
-	        sprite_full = is_moving ? character_run_right : character_idle_right;
+	        sprite_full = is_moving ? spr_character_run_right : spr_character_idle_right;
 	        move_speed_right = is_moving ? increaseSpeed(move_speed_right) : decreaseSpeed(move_speed_right);
 	        move_speed_left = decreaseSpeed(move_speed_left);
 	        move_speed_up = decreaseSpeed(move_speed_up);
@@ -438,7 +469,7 @@ if (attacking) {
 	        break;
 
 	    case "up":
-	        sprite_full = is_moving ? character_run_up : character_idle_back;
+	        sprite_full = is_moving ? spr_character_run_up : spr_character_idle_back;
 	        move_speed_up = is_moving ? increaseSpeed(move_speed_up) : decreaseSpeed(move_speed_up);
 	        move_speed_down = decreaseSpeed(move_speed_down);
 	        move_speed_left = decreaseSpeed(move_speed_left);
@@ -446,7 +477,7 @@ if (attacking) {
 	        break;
 
 	    case "down":
-	        sprite_full = is_moving ? character_run_down : character_idle_front;
+	        sprite_full = is_moving ? spr_character_run_down : spr_character_idle_front;
 	        move_speed_down = is_moving ? increaseSpeed(move_speed_down) : decreaseSpeed(move_speed_down);
 	        move_speed_up = decreaseSpeed(move_speed_up);
 	        move_speed_left = decreaseSpeed(move_speed_left);
@@ -454,7 +485,7 @@ if (attacking) {
 	        break;
 
 	    case "down_left":
-	        sprite_full = is_moving ? character_run_down_left : character_idle_front_left;
+	        sprite_full = is_moving ? spr_character_run_down_left : spr_character_idle_front_left;
 	        move_speed_left = is_moving ? increaseDiagonalSpeed(move_speed_left) : decreaseSpeed(move_speed_left);
 	        move_speed_down = is_moving ? increaseDiagonalSpeed(move_speed_down) : decreaseSpeed(move_speed_down);
 	        move_speed_right = decreaseSpeed(move_speed_right);
@@ -462,7 +493,7 @@ if (attacking) {
 	        break;
 
 	    case "down_right":
-	        sprite_full = is_moving ? character_run_down_right : character_idle_front_right;
+	        sprite_full = is_moving ? spr_character_run_down_right : spr_character_idle_front_right;
 	        move_speed_right = is_moving ? increaseDiagonalSpeed(move_speed_right) : decreaseSpeed(move_speed_right);
 	        move_speed_down = is_moving ? increaseDiagonalSpeed(move_speed_down) : decreaseSpeed(move_speed_down);
 	        move_speed_left = decreaseSpeed(move_speed_left);
@@ -470,7 +501,7 @@ if (attacking) {
 	        break;
 
 	    case "up_left":
-	        sprite_full = is_moving ? character_run_up_left : character_idle_back_left;
+	        sprite_full = is_moving ? spr_character_run_up_left : spr_character_idle_back_left;
 	        move_speed_left = is_moving ? increaseDiagonalSpeed(move_speed_left) : decreaseSpeed(move_speed_left);
 	        move_speed_up = is_moving ? increaseDiagonalSpeed(move_speed_up) : decreaseSpeed(move_speed_up);
 	        move_speed_right = decreaseSpeed(move_speed_right);
@@ -478,7 +509,7 @@ if (attacking) {
 	        break;
 
 	    case "up_right":
-	        sprite_full = is_moving ? character_run_up_right : character_idle_back_right;
+	        sprite_full = is_moving ? spr_character_run_up_right : spr_character_idle_back_right;
 	        move_speed_right = is_moving ? increaseDiagonalSpeed(move_speed_right) : decreaseSpeed(move_speed_right);
 	        move_speed_up = is_moving ? increaseDiagonalSpeed(move_speed_up) : decreaseSpeed(move_speed_up);
 	        move_speed_left = decreaseSpeed(move_speed_left);
@@ -520,3 +551,26 @@ if (vmove != 0) {
         y += vmove;
     }
 }
+// Check if the hookshot exists
+/*if (instance_exists(obj_hookshot)) {
+    // Get the instance of the active hookshot
+    var hook = instance_nearest(x, y, obj_hookshot);
+    
+    // Check if the hook is attached
+    if (hook.hook_attached) {
+        show_debug_message("Hookshot is attached!");
+        
+        // Here, you can add movement logic to pull the player towards the hook
+        var pull_speed = 5;
+        var move_dir = point_direction(x, y, hook.x, hook.y);
+        x += lengthdir_x(pull_speed, move_dir);
+        y += lengthdir_y(pull_speed, move_dir);
+        
+        // Stop pulling when close to the hook
+        if (point_distance(x, y, hook.x, hook.y) < pull_speed) {
+            show_debug_message("Reached the hook!");
+            instance_destroy(hook); // Destroy the hook after reaching
+            hook_active = false; // Reset hookshot state
+        }
+    }
+*/

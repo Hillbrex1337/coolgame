@@ -12,7 +12,10 @@
     "name":"Objects",
     "path":"folders/Objects.yy",
   },
-  "parentObjectId":null,
+  "parentObjectId":{
+    "name":"obj_movable",
+    "path":"objects/obj_movable/obj_movable.yy",
+  },
   "persistent":false,
   "physicsAngularDamping":0.1,
   "physicsDensity":0.5,
@@ -31,8 +34,8 @@
   "resourceVersion":"2.0",
   "solid":false,
   "spriteId":{
-    "name":"autum_tree",
-    "path":"sprites/autum_tree/autum_tree.yy",
+    "name":"spr_autum_tree",
+    "path":"sprites/spr_autum_tree/spr_autum_tree.yy",
   },
   "spriteMaskId":null,
   "visible":true,
