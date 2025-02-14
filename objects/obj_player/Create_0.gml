@@ -9,6 +9,7 @@ move_speed_right = 3;
 move_speed_left = 3;
 move_speed_up = 3;
 move_speed_down = 3;
+move_speed_slope = 0.7071;
 speed_increment = 0.6;
 frozen_timer = 0;
 frozen = false;
@@ -92,8 +93,8 @@ facing_direction = "down"; // Default to facing downward
 sprite_full = spr_character_idle_front; // Can be idle or running
 sprite_frozen = NaN;
 
-//hookshot
-hook_active = false;
+//height above sea level physics
+has=0;
 
 // Follower logic
 array_size = 94;
@@ -102,66 +103,25 @@ for (var i = array_size - 1; i >= 0; i--) {
     saved_pos_y[i] = y;
 }
 
-// Flag to indicate whether party members have been initialized
-party_members_initialized = false;
 
-// Create followers if party members are initialized
-if (!party_members_initialized && global.spawn_followers_at_player) {
-    if (variable_global_exists("party_members")) {
-        var party_members = global.party_members;
-
-        if (ds_exists(party_members, ds_type_map)) {
-            show_debug_message("party_members is a valid ds_map");
-
-            var map_size = ds_map_size(party_members);
-            show_debug_message("party_members size: " + string(map_size));
-
-            if (map_size > 0) {
-                var record_value = 7;
-                var index = 0;
-                var key = ds_map_find_first(party_members);
-
-                while (key != undefined) {
-                    var member = party_members[? key];
-
-                    if (index == 0) {
-                        index++;
-                        key = ds_map_find_next(party_members, key);
-                        continue;
-                    }
-
-                    var follower_instance = instance_create_layer(saved_pos_x[record_value], y, "Player", obj_follower);
-                    follower_instance.sprite_index = member.sprite;
-                    follower_instance.record = record_value;
-
-                    record_value += 7;
-                    index++;
-                    key = ds_map_find_next(party_members, key);
-                }
-
-                party_members_initialized = true;
-            } else {
-                show_debug_message("party_members is empty.");
-            }
-        } else {
-            show_debug_message("party_members is not a valid ds_map.");
-        }
-    } else {
-        show_debug_message("global.party_members is not initialized.");
-    }
-}
-
-function decreaseSpeed(some_speed) {
-    return some_speed > 0 ? some_speed - speed_increment : 0;
+function decreaseSpeed(some_speed, min_speed) {
+    return some_speed >  min_speed ? some_speed - speed_increment :  min_speed;
 }
 
 // Function to increase speed but cap it at max speed
-function increaseSpeed(some_speed) {
-    return some_speed < move_speed_max ? some_speed + speed_increment : move_speed_max;
+function increaseSpeed(some_speed, max_speed) {
+    return some_speed < max_speed ? some_speed + speed_increment : max_speed;
 }
 
 // Function to increase speed for diagonal movement (scaled by sqrt(2))
 function increaseDiagonalSpeed(some_speed) {
     maxDiagonalSpeed = move_speed_max / sqrt(2);
     return some_speed < maxDiagonalSpeed ? some_speed + speed_increment : maxDiagonalSpeed;
+}
+
+// Get the tilemap ID from the layer in the room
+if (layer_exists("slope_and_stair_tiles")) {
+    self.tilemap_slope_layer = layer_tilemap_get_id("slope_and_stair_tiles");
+} else {
+    show_debug_message("Error: Tilemap layer 'slope_and_stair_tiles' does not exist!");
 }

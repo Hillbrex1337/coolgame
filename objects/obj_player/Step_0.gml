@@ -7,6 +7,7 @@ vmove = global.vmove;
 var facing_direction_old = facing_direction; // used to check if direction changed
 sprite_index = sprite_full;
 
+
 // Handle movement input
 if(frozen_timer>=0){
 	frozen = true;
@@ -19,6 +20,11 @@ if(frozen_timer>=0){
 	move_speed_left=0;
 	move_speed_right=0;
 	image_speed=0;
+	var beam = instance_nearest(x, y, obj_tractor_beam);
+		 with (obj_movable) {
+		    is_hit = false;
+		}
+         instance_destroy(beam); // Destroy the hook after reaching
 } else {
 	frozen = false;
 }
@@ -60,6 +66,15 @@ if (!frozen){
 	// ** Reset is_moving if no movement keys are pressed **
 	if (!(keyboard_check(ord("A")) || keyboard_check(ord("D")) || keyboard_check(ord("W")) || keyboard_check(ord("S")))) {
 	    is_moving = false;
+	}
+	
+	if (!(keyboard_check(ord("Q") || keyboard_check(ord("E"))))){
+		 var beam = instance_nearest(x, y, obj_tractor_beam);
+		 with (obj_movable) {
+		    is_pulled = false;
+			is_pushed = false;
+		}
+         instance_destroy(beam); // Destroy the hook after reaching
 	}
 
 	// Melee attack logic
@@ -255,6 +270,8 @@ if (!frozen){
 	        case "down_right": dodge_x = dodge_speed * 0.707; dodge_y = dodge_speed * 0.707; break;
 	        case "down_left": dodge_x = -dodge_speed * 0.707; dodge_y = dodge_speed * 0.707; break;
 	    }
+		
+		
 	}
 	
 	if (keyboard_check_pressed(vk_space) && !hook_active) {
@@ -282,9 +299,25 @@ if (!frozen){
 	}
 	if (keyboard_check_released(ord("Q"))) {
 	     var beam = instance_nearest(x, y, obj_tractor_beam);
-		 with(beam.hit){
-			 is_hit=false;
-		 }
+		 with (obj_movable) {
+		    is_pulled = false;
+			is_pushed = false;
+		}
+         instance_destroy(beam); // Destroy the hook after reaching
+	}
+	
+	if (keyboard_check_pressed(ord("E"))) {
+	    var beam = instance_create_layer(x, y, "Player", obj_tractor_beam);
+		beam.repelling=true;
+		beam.owner = id;
+		
+	}
+	if (keyboard_check_released(ord("E"))) {
+	     var beam = instance_nearest(x, y, obj_tractor_beam);
+		 with (obj_movable) {
+		    is_pulled = false;
+			is_pushed = false;
+		}
          instance_destroy(beam); // Destroy the hook after reaching
 	}
 
@@ -454,70 +487,124 @@ if (attacking) {
 	switch (facing_direction) {
 	    case "left":
 	        sprite_full = is_moving ? spr_character_run_left : spr_character_idle_left;
-	        move_speed_left = is_moving ? increaseSpeed(move_speed_left) : decreaseSpeed(move_speed_left);
-	        move_speed_right = decreaseSpeed(move_speed_right);
-	        move_speed_up = decreaseSpeed(move_speed_up);
-	        move_speed_down = decreaseSpeed(move_speed_down);
+	        move_speed_left = is_moving ? increaseSpeed(move_speed_left, move_speed_max) : decreaseSpeed(move_speed_left, 0);
+	        move_speed_right = decreaseSpeed(move_speed_right, 0);
+	        move_speed_up = decreaseSpeed(move_speed_up, 0);
+	        move_speed_down = decreaseSpeed(move_speed_down, 0);
 	        break;
 
 	    case "right":
 	        sprite_full = is_moving ? spr_character_run_right : spr_character_idle_right;
-	        move_speed_right = is_moving ? increaseSpeed(move_speed_right) : decreaseSpeed(move_speed_right);
-	        move_speed_left = decreaseSpeed(move_speed_left);
-	        move_speed_up = decreaseSpeed(move_speed_up);
-	        move_speed_down = decreaseSpeed(move_speed_down);
+	        move_speed_right = is_moving ? increaseSpeed(move_speed_right, move_speed_max) : decreaseSpeed(move_speed_right, 0);
+	        move_speed_left = decreaseSpeed(move_speed_left, 0);
+	        move_speed_up = decreaseSpeed(move_speed_up, 0);
+	        move_speed_down = decreaseSpeed(move_speed_down, 0);
 	        break;
 
 	    case "up":
 	        sprite_full = is_moving ? spr_character_run_up : spr_character_idle_back;
-	        move_speed_up = is_moving ? increaseSpeed(move_speed_up) : decreaseSpeed(move_speed_up);
-	        move_speed_down = decreaseSpeed(move_speed_down);
-	        move_speed_left = decreaseSpeed(move_speed_left);
-	        move_speed_right = decreaseSpeed(move_speed_right);
+	        move_speed_up = is_moving ? increaseSpeed(move_speed_up, move_speed_max) : decreaseSpeed(move_speed_up, 0);
+	        move_speed_down = decreaseSpeed(move_speed_down, 0);
+	        move_speed_left = decreaseSpeed(move_speed_left, 0);
+	        move_speed_right = decreaseSpeed(move_speed_right, 0);
 	        break;
 
 	    case "down":
 	        sprite_full = is_moving ? spr_character_run_down : spr_character_idle_front;
-	        move_speed_down = is_moving ? increaseSpeed(move_speed_down) : decreaseSpeed(move_speed_down);
-	        move_speed_up = decreaseSpeed(move_speed_up);
-	        move_speed_left = decreaseSpeed(move_speed_left);
-	        move_speed_right = decreaseSpeed(move_speed_right);
+	        move_speed_down = is_moving ? increaseSpeed(move_speed_down, move_speed_max) : decreaseSpeed(move_speed_down, 0);
+	        move_speed_up = decreaseSpeed(move_speed_up, 0);
+	        move_speed_left = decreaseSpeed(move_speed_left, 0);
+	        move_speed_right = decreaseSpeed(move_speed_right, 0);
 	        break;
 
 	    case "down_left":
 	        sprite_full = is_moving ? spr_character_run_down_left : spr_character_idle_front_left;
-	        move_speed_left = is_moving ? increaseDiagonalSpeed(move_speed_left) : decreaseSpeed(move_speed_left);
-	        move_speed_down = is_moving ? increaseDiagonalSpeed(move_speed_down) : decreaseSpeed(move_speed_down);
-	        move_speed_right = decreaseSpeed(move_speed_right);
-	        move_speed_up = decreaseSpeed(move_speed_up);
+	        move_speed_left = is_moving ? increaseDiagonalSpeed(move_speed_left) : decreaseSpeed(move_speed_left, 0);
+	        move_speed_down = is_moving ? increaseDiagonalSpeed(move_speed_down) : decreaseSpeed(move_speed_down, 0);
+	        move_speed_right = decreaseSpeed(move_speed_right, 0);
+	        move_speed_up = decreaseSpeed(move_speed_up, 0);
 	        break;
 
 	    case "down_right":
 	        sprite_full = is_moving ? spr_character_run_down_right : spr_character_idle_front_right;
-	        move_speed_right = is_moving ? increaseDiagonalSpeed(move_speed_right) : decreaseSpeed(move_speed_right);
-	        move_speed_down = is_moving ? increaseDiagonalSpeed(move_speed_down) : decreaseSpeed(move_speed_down);
-	        move_speed_left = decreaseSpeed(move_speed_left);
-	        move_speed_up = decreaseSpeed(move_speed_up);
+	        move_speed_right = is_moving ? increaseDiagonalSpeed(move_speed_right) : decreaseSpeed(move_speed_right, 0);
+	        move_speed_down = is_moving ? increaseDiagonalSpeed(move_speed_down) : decreaseSpeed(move_speed_down, 0);
+	        move_speed_left = decreaseSpeed(move_speed_left, 0);
+	        move_speed_up = decreaseSpeed(move_speed_up, 0);
 	        break;
 
 	    case "up_left":
 	        sprite_full = is_moving ? spr_character_run_up_left : spr_character_idle_back_left;
-	        move_speed_left = is_moving ? increaseDiagonalSpeed(move_speed_left) : decreaseSpeed(move_speed_left);
-	        move_speed_up = is_moving ? increaseDiagonalSpeed(move_speed_up) : decreaseSpeed(move_speed_up);
-	        move_speed_right = decreaseSpeed(move_speed_right);
-	        move_speed_down = decreaseSpeed(move_speed_down);
+	        move_speed_left = is_moving ? increaseDiagonalSpeed(move_speed_left) : decreaseSpeed(move_speed_left, 0);
+	        move_speed_up = is_moving ? increaseDiagonalSpeed(move_speed_up) : decreaseSpeed(move_speed_up, 0);
+	        move_speed_right = decreaseSpeed(move_speed_right, 0);
+	        move_speed_down = decreaseSpeed(move_speed_down, 0);
 	        break;
 
 	    case "up_right":
 	        sprite_full = is_moving ? spr_character_run_up_right : spr_character_idle_back_right;
-	        move_speed_right = is_moving ? increaseDiagonalSpeed(move_speed_right) : decreaseSpeed(move_speed_right);
-	        move_speed_up = is_moving ? increaseDiagonalSpeed(move_speed_up) : decreaseSpeed(move_speed_up);
-	        move_speed_left = decreaseSpeed(move_speed_left);
-	        move_speed_down = decreaseSpeed(move_speed_down);
+	        move_speed_right = is_moving ? increaseDiagonalSpeed(move_speed_right) : decreaseSpeed(move_speed_right, 0);
+	        move_speed_up = is_moving ? increaseDiagonalSpeed(move_speed_up) : decreaseSpeed(move_speed_up, 0);
+	        move_speed_left = decreaseSpeed(move_speed_left, 0);
+	        move_speed_down = decreaseSpeed(move_speed_down, 0);
 	        break;
 		}
 		if (is_moving) {
 			image_speed = image_speed_moving; // Use normal movement animation speed
+			if (self.tilemap_slope_layer != -1) {
+			    var _tile = tilemap_get_at_pixel(self.tilemap_slope_layer, x, y+24);
+				var tile_size = 32;
+				var diagonal_distance = sqrt(tile_size * tile_size + tile_size * tile_size);
+				var steps = diagonal_distance / hmove;
+				
+			    if (_tile != -1) { // Ensure a valid tile was found
+			        if (_tile == 1) { // ↗ Up-Right Slope
+			            if (facing_direction == "right" || facing_direction == "up_right" || facing_direction == "down_right") {
+							move_speed_right = move_speed_right/1.3;
+							move_speed_up = move_speed_right/2;
+			            }
+			            if (facing_direction == "left" || facing_direction == "up_left" || facing_direction == "down_left") {
+							move_speed_left= move_speed_left/1.3;
+							move_speed_down = move_speed_left/2;
+			            }
+			        }
+
+			        if (_tile == 2) { // ⬆ Steep Up
+			            if (facing_direction == "up" || facing_direction == "up_left" || facing_direction == "up_right") {
+			                move_speed_up = move_speed_up/1.3;
+			             
+			            }
+			            if (facing_direction == "down" || facing_direction == "down_left" || facing_direction == "down_right") {
+			                move_speed_down = move_speed_down/1.3;;
+			               
+			            }
+			        }
+
+			        if (_tile == 3) { // ↖ Up-Left Slope
+			            if (facing_direction == "left" || facing_direction == "up_left" || facing_direction == "down_left") {
+			                move_speed_up = increaseSpeed(move_speed_up*move_speed_slope);
+			                move_speed_down = decreaseSpeed(move_speed_down*move_speed_slope);
+			            }
+			            if (facing_direction == "right" || facing_direction == "up_right" || facing_direction == "down_right") {
+			                move_speed_down = increaseSpeed(move_speed_down*move_speed_slope);
+			                move_speed_up = decreaseSpeed(move_speed_up*move_speed_slope);
+			            }
+			        }
+
+			        if (_tile == 4) { // ⬇ Down Slope
+			            if (facing_direction == "down" || facing_direction == "down_left" || facing_direction == "down_right") {
+			                move_speed_down = increaseSpeed(move_speed_down*move_speed_slope);
+			                move_speed_up = decreaseSpeed(move_speed_up*move_speed_slope);
+			            }
+			            if (facing_direction == "up" || facing_direction == "up_left" || facing_direction == "up_right") {
+			                move_speed_up = increaseSpeed(move_speed_up*move_speed_slope);
+			                move_speed_down = decreaseSpeed(move_speed_down*move_speed_slope);
+			            }
+			        }
+			    } else {
+			        show_debug_message("Warning: No tile found at (" + string(x) + ", " + string(y) + ")");
+			    }
+			}
 		} else {
 		    image_speed = image_speed_idle; // Use idle animation speed
 		}
@@ -531,46 +618,90 @@ if (attacking) {
 // **🔥 Collision and Movement Logic 🔥**
 var feet_left_x = x - 14;
 var feet_right_x = x + 9;
-var feet_y = y;
+var feet_y = y+24;
 
 // Depth sorting
 depth = room_height - bbox_bottom + 100;
 
 // Collision handling before applying movement
+// Movement input
 hmove = move_speed_right - move_speed_left;
-vmove = move_speed_down- move_speed_up;
-if (hmove != 0) {
-    if (!collision_point(feet_left_x + hmove, feet_y, obj_stopper, true, true) &&
-        !collision_point(feet_right_x + hmove, feet_y, obj_stopper, true, true)) {
-        x += hmove;
-    }
+vmove = move_speed_down - move_speed_up;
+
+var _tilemap = layer_tilemap_get_id("collision_tiles"); // Get tilemap
+
+var future_x = x + hmove;
+var future_y = y + vmove;
+
+var can_move_x = !tile_collision_check(_tilemap, future_x, bbox_bottom);
+var can_move_y = !tile_collision_check(_tilemap, x, bbox_bottom + vmove);
+
+if (!can_move_x && can_move_y) {
+    // Blocked horizontally but free vertically → Follow wall up/down
+    x = x; // No movement in X
+    y += vmove;
+} 
+else if (!can_move_y && can_move_x) {
+    // Blocked vertically but free horizontally → Follow wall left/right
+    y = y; // No movement in Y
+    x += hmove;
+} 
+else if (!can_move_x && !can_move_y) {
+    // Fully blocked, stop movement
+} 
+else {
+    // Free movement if nothing is blocking
+    x += hmove;
+    y += vmove;
 }
-if (vmove != 0) {
-    if (!collision_point(feet_left_x, feet_y + vmove, obj_stopper, true, true) &&
-        !collision_point(feet_right_x, feet_y + vmove, obj_stopper, true, true)) {
-        y += vmove;
-    }
+
+
+
+// height and drop physics
+// Get the collision and height map tile layers
+var _tilemap_collision = layer_tilemap_get_id("collision_tiles");
+var _tilemap_height = layer_tilemap_get_id("height_map_tiles");
+var _tilemap_ground = layer_tilemap_get_id("ground_tiles"); // Layer for solid ground
+
+// Get the tile the player is standing on (collision layer)
+var tile_id_collision = tilemap_get_at_pixel(_tilemap_collision, x, bbox_bottom);
+
+// Get the height tile the player is standing on
+var tile_id_height = tilemap_get_at_pixel(_tilemap_height, x, bbox_bottom);
+
+// Set height above sea level (has) based on tile ID
+if (tile_id_height == 1) {
+    has = 64;
+} 
+else if (tile_id_height == 2) {
+    has = 20;
+} 
+else if (tile_id_height == 3) {
+    has = 30;
+} 
+else {
+    has = 0; // Default height if no tile is found
 }
-// Check if the hookshot exists
-/*if (instance_exists(obj_hookshot)) {
-    // Get the instance of the active hookshot
-    var hook = instance_nearest(x, y, obj_hookshot);
-    
-    // Check if the hook is attached
-    if (hook.hook_attached) {
-        show_debug_message("Hookshot is attached!");
-        
-        // Here, you can add movement logic to pull the player towards the hook
-        var pull_speed = 5;
-        var move_dir = point_direction(x, y, hook.x, hook.y);
-        x += lengthdir_x(pull_speed, move_dir);
-        y += lengthdir_y(pull_speed, move_dir);
-        
-        // Stop pulling when close to the hook
-        if (point_distance(x, y, hook.x, hook.y) < pull_speed) {
-            show_debug_message("Reached the hook!");
-            instance_destroy(hook); // Destroy the hook after reaching
-            hook_active = false; // Reset hookshot state
-        }
-    }
-*/
+
+// Initialize vertical speed
+if (!variable_global_exists("vsp")) {
+    vsp = 0;
+}
+
+// **Falling Logic**
+if (tile_id_collision == 2) {
+    // Start falling with an initial drop of `has` pixels
+    y += has;
+    vsp = 2; // Give some initial downward velocity
+}
+
+// **Continue Falling Until Hitting Ground**
+var tile_below = tilemap_get_at_pixel(_tilemap_ground, x, bbox_bottom + 1);
+
+if (tile_below == 0) {  // No ground below → Keep falling
+    vsp += 0.5; // Apply gravity (increase speed over time)
+    y += vsp;  // Move down with velocity
+} 
+else {
+    vsp = 0; // Stop falling when on solid ground
+}

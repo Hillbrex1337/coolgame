@@ -1,4 +1,5 @@
-is_hit = false;
+is_pushed = false;
+is_pulled = false;
 x_hit=0;
 y_hit=0;
 aura_index = 0;

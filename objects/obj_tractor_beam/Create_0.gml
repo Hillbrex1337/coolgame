@@ -1,16 +1,11 @@
-x_start=0;
-y_start=0;
-beam_distance = 0;
-mirror_beam_distance = 0;
-beam_distance_max = 800;
-growth_increment = 10;
-pulling = false;
-hit = noone;
-mirror_hit = noone;
-mirror=false;
-reflect_x =0;
-reflect_y=0;
+// Array to store key collision points (origin, mirrors, objects)
+beam_path = [];  
+
+// Tracking variables
+moving = true;
+target = noone;
 reflected = false;
-min_reflection_angle =10.1;
-max_reflection_angle = 170;
-image_speed = 0.5;
+max_distance = 1500;  // Maximum beam range
+beam_length = 0;
+
+repelling = false;

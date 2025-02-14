@@ -5,9 +5,13 @@ if (!variable_instance_exists(id, "x_hit")) {
     x_hit=0; // Ensure it's initialized
 }
 
-if (!variable_instance_exists(id, "is_hit")) {
-    is_hit = false; // Ensure it's initialized
-}if (!variable_instance_exists(id, "aura_index")) {
+if (!variable_instance_exists(id, "is_pulled")) {
+    is_pulled = false; // Ensure it's initialized
+}
+if (!variable_instance_exists(id, "is_pushed")) {
+    is_pushed = false; // Ensure it's initialized
+}
+if (!variable_instance_exists(id, "aura_index")) {
     aura_index = 0; // Ensure it's initialized
 }
 if (!variable_instance_exists(id, "image_index")) {
@@ -26,7 +30,7 @@ if (!variable_instance_exists(id, "front_direction")) {
 
 draw_self();
 
-if (is_hit) {
+if (is_pulled || is_pushed) {
 	shader_set(shd_aura);
     var obj_width = sprite_get_width(sprite_index); // Get object sprite width
     var obj_height = sprite_get_height(sprite_index); // Get object sprite height
@@ -36,7 +40,12 @@ if (is_hit) {
 	if (floor(aura_index >= 5)){
 		aura_index = 0;
 	}
-    draw_sprite(spr_aura, aura_index, x_hit, y_hit); // Color & transparency
-	is_hit=false;
+	if(is_pulled){
+	    draw_sprite(spr_aura, aura_index, x_hit, y_hit); // Color & transparency
+		is_pulled=false;
+	} else {
+		draw_sprite(spr_aura_repell, aura_index, x_hit, y_hit); // Color & transparency
+		is_pushed=false;
+	}
 }
 shader_reset();

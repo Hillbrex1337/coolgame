@@ -14,3 +14,4 @@ if (is_hit){
 		aura_index = 0;
 	}
 }
+
