@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"Script6",
+  "%Name":"scr_tile_collision_line",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"Script6",
+  "name":"scr_tile_collision_line",
   "parent":{
     "name":"Scripts",
     "path":"folders/Scripts.yy",

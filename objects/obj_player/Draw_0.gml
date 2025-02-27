@@ -4,7 +4,25 @@ draw_set_alpha(0.5); // Adjust transparency
 draw_set_color(c_black);
 
 // Draw an ellipse under the player
-draw_ellipse(x - 12, y + 14, x + 11, y + 28, false);
+// Constants
+
+// Get movement angle from hmove and vmove
+var angle = radtodeg(arctan2(vmove, hmove)); // Converts radians to degrees
+
+// Convert to radians
+var rad = degtorad(angle);
+
+// Calculate shadow height using sin()
+var height = (z / 2) + (sin(rad) * (z / 4));
+if (height>0)
+	show_debug_message("height: " + string(height));
+// Scale effect (smaller when going up, larger when falling)
+var scale = z/24;
+
+// Draw the shadow ellipse
+draw_ellipse(x - 12 + scale, y + height + scale + 14, x + 11 - scale, y - scale + height + 28, false);
+
+
 
 // Reset color and alpha
 draw_set_color(c_white);
@@ -63,6 +81,7 @@ shader_reset();
 /////////////////////////////////////////
 
 if (attacking) {
+	
 	draw_set_alpha(0.3); // 50% Transparency (0 = fully transparent, 1 = fully opaque)
 	draw_set_color(c_black); // Set color to black
 	draw_circle(x, y, 50, false); // Draw a filled circle with radius 30

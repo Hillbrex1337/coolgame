@@ -1,9 +1,6 @@
 // Movement speed
 // Persistent movement variables (do NOT reset each frame)
-if (!variable_global_exists("hmove")) global.hmove = 0;
-if (!variable_global_exists("vmove")) global.vmove = 0;
-hmove = global.hmove;
-vmove = global.vmove;
+
 var facing_direction_old = facing_direction; // used to check if direction changed
 sprite_index = sprite_full;
 
@@ -28,7 +25,8 @@ if(frozen_timer>=0){
 } else {
 	frozen = false;
 }
-if (!frozen){
+
+if (!frozen && !falling){
 	if (keyboard_check(ord("A"))) {
 	    facing_direction = "left";
 		sprite_atom = atom_melee_left;
@@ -364,10 +362,10 @@ if (!dodging) {
 
 // **🔥 Lower Body Animation Control 🔥**
 if (attacking) {
-	move_speed_left = decreaseSpeed(move_speed_left);
-	move_speed_right = decreaseSpeed(move_speed_right);
-	move_speed_up = decreaseSpeed(move_speed_up);
-	move_speed_down = decreaseSpeed(move_speed_down);
+	move_speed_left = decreaseSpeed(move_speed_left, 0);
+	move_speed_right = decreaseSpeed(move_speed_right, 0);
+	move_speed_up = decreaseSpeed(move_speed_up, 0);
+	move_speed_down = decreaseSpeed(move_speed_down, 0);
 	first_attack = false;
 	atom_spawned = true;
 	// If dashing, move the player
@@ -426,8 +424,6 @@ if (attacking) {
 	afterimages[0] = [x, y, 1.0]
 	// TODO add doge sprite
 	dodge_cooldown = 30;
-    x += dodge_x;
-    y += dodge_y;
     dodge_timer--;
 
     if (dodge_timer <= 0) {
@@ -472,6 +468,7 @@ if (attacking) {
 
         charge_attack_melee = false;
     }
+} else if(jumping){
 } else if(frozen){
 } else {
 	force_dash=false;
@@ -551,60 +548,7 @@ if (attacking) {
 		}
 		if (is_moving) {
 			image_speed = image_speed_moving; // Use normal movement animation speed
-			if (self.tilemap_slope_layer != -1) {
-			    var _tile = tilemap_get_at_pixel(self.tilemap_slope_layer, x, y+24);
-				var tile_size = 32;
-				var diagonal_distance = sqrt(tile_size * tile_size + tile_size * tile_size);
-				var steps = diagonal_distance / hmove;
-				
-			    if (_tile != -1) { // Ensure a valid tile was found
-			        if (_tile == 1) { // ↗ Up-Right Slope
-			            if (facing_direction == "right" || facing_direction == "up_right" || facing_direction == "down_right") {
-							move_speed_right = move_speed_right/1.3;
-							move_speed_up = move_speed_right/2;
-			            }
-			            if (facing_direction == "left" || facing_direction == "up_left" || facing_direction == "down_left") {
-							move_speed_left= move_speed_left/1.3;
-							move_speed_down = move_speed_left/2;
-			            }
-			        }
-
-			        if (_tile == 2) { // ⬆ Steep Up
-			            if (facing_direction == "up" || facing_direction == "up_left" || facing_direction == "up_right") {
-			                move_speed_up = move_speed_up/1.3;
-			             
-			            }
-			            if (facing_direction == "down" || facing_direction == "down_left" || facing_direction == "down_right") {
-			                move_speed_down = move_speed_down/1.3;;
-			               
-			            }
-			        }
-
-			        if (_tile == 3) { // ↖ Up-Left Slope
-			            if (facing_direction == "left" || facing_direction == "up_left" || facing_direction == "down_left") {
-			                move_speed_up = increaseSpeed(move_speed_up*move_speed_slope);
-			                move_speed_down = decreaseSpeed(move_speed_down*move_speed_slope);
-			            }
-			            if (facing_direction == "right" || facing_direction == "up_right" || facing_direction == "down_right") {
-			                move_speed_down = increaseSpeed(move_speed_down*move_speed_slope);
-			                move_speed_up = decreaseSpeed(move_speed_up*move_speed_slope);
-			            }
-			        }
-
-			        if (_tile == 4) { // ⬇ Down Slope
-			            if (facing_direction == "down" || facing_direction == "down_left" || facing_direction == "down_right") {
-			                move_speed_down = increaseSpeed(move_speed_down*move_speed_slope);
-			                move_speed_up = decreaseSpeed(move_speed_up*move_speed_slope);
-			            }
-			            if (facing_direction == "up" || facing_direction == "up_left" || facing_direction == "up_right") {
-			                move_speed_up = increaseSpeed(move_speed_up*move_speed_slope);
-			                move_speed_down = decreaseSpeed(move_speed_down*move_speed_slope);
-			            }
-			        }
-			    } else {
-			        show_debug_message("Warning: No tile found at (" + string(x) + ", " + string(y) + ")");
-			    }
-			}
+			
 		} else {
 		    image_speed = image_speed_idle; // Use idle animation speed
 		}
@@ -614,94 +558,44 @@ if (attacking) {
     // Apply movement animation speed
 
 
-
-// **🔥 Collision and Movement Logic 🔥**
-var feet_left_x = x - 14;
-var feet_right_x = x + 9;
-var feet_y = y+24;
-
 // Depth sorting
 depth = room_height - bbox_bottom + 100;
 
 // Collision handling before applying movement
-// Movement input
-hmove = move_speed_right - move_speed_left;
-vmove = move_speed_down - move_speed_up;
 
-var _tilemap = layer_tilemap_get_id("collision_tiles"); // Get tilemap
 
-var future_x = x + hmove;
-var future_y = y + vmove;
+//show_debug_message(string(dodge_y));
 
-var can_move_x = !tile_collision_check(_tilemap, future_x, bbox_bottom);
-var can_move_y = !tile_collision_check(_tilemap, x, bbox_bottom + vmove);
 
-if (!can_move_x && can_move_y) {
-    // Blocked horizontally but free vertically → Follow wall up/down
-    x = x; // No movement in X
-    y += vmove;
-} 
-else if (!can_move_y && can_move_x) {
-    // Blocked vertically but free horizontally → Follow wall left/right
-    y = y; // No movement in Y
-    x += hmove;
-} 
-else if (!can_move_x && !can_move_y) {
-    // Fully blocked, stop movement
-} 
-else {
-    // Free movement if nothing is blocking
-    x += hmove;
-    y += vmove;
+event_inherited(); // falling pshysics
+
+//jumping
+
+if(about_to_jump){
+	hmove=0;
+	vmove=0;
 }
+if (z>0){
+	is_moving=false;
+	
 
+	if(jump_factor>0){
+		jumping = true;
+		vmove-=jump_factor;
+		z+=jump_factor;
+		jump_factor-=0.5;
+	} else {
+		jumping = false;
+	}
+		
+	image_index=0;
+	image_speed=0;
 
-
-// height and drop physics
-// Get the collision and height map tile layers
-var _tilemap_collision = layer_tilemap_get_id("collision_tiles");
-var _tilemap_height = layer_tilemap_get_id("height_map_tiles");
-var _tilemap_ground = layer_tilemap_get_id("ground_tiles"); // Layer for solid ground
-
-// Get the tile the player is standing on (collision layer)
-var tile_id_collision = tilemap_get_at_pixel(_tilemap_collision, x, bbox_bottom);
-
-// Get the height tile the player is standing on
-var tile_id_height = tilemap_get_at_pixel(_tilemap_height, x, bbox_bottom);
-
-// Set height above sea level (has) based on tile ID
-if (tile_id_height == 1) {
-    has = 64;
-} 
-else if (tile_id_height == 2) {
-    has = 20;
-} 
-else if (tile_id_height == 3) {
-    has = 30;
-} 
-else {
-    has = 0; // Default height if no tile is found
-}
-
-// Initialize vertical speed
-if (!variable_global_exists("vsp")) {
-    vsp = 0;
-}
-
-// **Falling Logic**
-if (tile_id_collision == 2) {
-    // Start falling with an initial drop of `has` pixels
-    y += has;
-    vsp = 2; // Give some initial downward velocity
-}
-
-// **Continue Falling Until Hitting Ground**
-var tile_below = tilemap_get_at_pixel(_tilemap_ground, x, bbox_bottom + 1);
-
-if (tile_below == 0) {  // No ground below → Keep falling
-    vsp += 0.5; // Apply gravity (increase speed over time)
-    y += vsp;  // Move down with velocity
-} 
-else {
-    vsp = 0; // Stop falling when on solid ground
+} else {
+	hmove = move_speed_right - move_speed_left + dodge_x;
+	vmove = move_speed_down - move_speed_up + dodge_y;
+	jump_factor=5;
+	jumping = false;
+	fall_speed_x= 0;
+	fall_speed_y=0;
 }
