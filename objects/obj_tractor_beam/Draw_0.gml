@@ -1,3 +1,6 @@
+// Set a fixed depth for the whole beam
+depth = -500;
+
 for (var i = 1; i < array_length(beam_path); i++) {
     var x1 = beam_path[i - 1][0];
     var y1 = beam_path[i - 1][1];
@@ -7,41 +10,48 @@ for (var i = 1; i < array_length(beam_path); i++) {
     var angle = point_direction(x1, y1, x2, y2);
     var segment_length = point_distance(x1, y1, x2, y2);
 
-    // Draw multiple smaller beam segments instead of stretching
-    var segment_step = sprite_width; // Length of each drawn beam sprite
-    var segments = ceil(segment_length / segment_step); // How many sprites needed
+    var segment_step = sprite_width;
+    var segments = floor(segment_length / segment_step); // use floor to stop just before final point
     var progress = 0;
 
     for (var j = 0; j < segments; j++) {
         var draw_x = x1 + lengthdir_x(progress, angle);
         var draw_y = y1 + lengthdir_y(progress, angle);
-		
-		if(repelling){
-	        draw_sprite_ext(
-	            spr_tractor_repell,
-	            image_index,
-	            draw_x,
-	            draw_y,
-	            1, // No horizontal stretch
-	            1, // No vertical stretch
-	            angle,
-	            c_white,
-	            1
-	        );
-		} else {
-			draw_sprite_ext(
-	            spr_tractor_beam,
-	            image_index,
-	            draw_x,
-	            draw_y,
-	            1, // No horizontal stretch
-	            1, // No vertical stretch
-	            angle,
-	            c_white,
-	            1
-	        );
-		}
 
-        progress += segment_step; // Move to next segment position
+        var beam_sprite = repelling ? spr_tractor_repell : spr_tractor_beam;
+
+        draw_sprite_ext(
+            beam_sprite,
+            image_index,
+            draw_x,
+            draw_y,
+            1,
+            1,
+            angle,
+            c_white,
+            1
+        );
+
+        progress += segment_step;
     }
+}
+
+// ✅ Draw aura at the beam endpoint (on top)
+if (array_length(beam_path) > 0) {
+    var last_point = beam_path[array_length(beam_path) - 1];
+    var aura_x = last_point[0];
+    var aura_y = last_point[1];
+
+    var aura_sprite = repelling ? spr_aura_repell : spr_aura;
+
+    draw_sprite_ext(
+        aura_sprite,
+        0,
+        aura_x,
+        aura_y,
+        1, 1,
+        0,
+        c_white,
+        1
+    );
 }

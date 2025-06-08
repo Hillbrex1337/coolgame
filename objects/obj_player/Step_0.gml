@@ -559,8 +559,8 @@ if (attacking) {
 
 
 // Depth sorting
-depth = room_height - bbox_bottom + 100;
-
+depth = - (y + sprite_height / 2);
+show_debug_message("depth is " + string(depth));
 // Collision handling before applying movement
 
 

@@ -41,7 +41,7 @@
   "resourceType":"GMSprite",
   "resourceVersion":"2.0",
   "sequence":{
-    "$GMSequence":"",
+    "$GMSequence":"v1",
     "%Name":"spr_character_idle_right",
     "autoRecord":true,
     "backdropHeight":768,
@@ -72,6 +72,8 @@
     "playbackSpeedType":0,
     "resourceType":"GMSequence",
     "resourceVersion":"2.0",
+    "seqHeight":68.0,
+    "seqWidth":68.0,
     "showBackdrop":true,
     "showBackdropImage":false,
     "timeUnits":1,

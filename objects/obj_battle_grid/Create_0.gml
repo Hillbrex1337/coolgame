@@ -1,9 +1,10 @@
 // Create Event
 
 animation_frame = 0;         // Tracks the current frame of animation
-animation_speed = 0.2;       // Speed of the initial animation (frames 1-5)
-phase = 1;                   // Track the current phase (1 or 2)
+animation_speed =0.2;       // Speed of the initial animation (frames 1-5)
+phase = 3;                   // Track the current phase (1 or 2)
 freeze_timer = 0;            // Timer to track how long to freeze at frame 5
+freeze_duration = 0;
 column_animation_speed = 0.5; // Speed for animating columns progressively (frames 6-14)
 current_column = 0;          // Track the column being animated in Phase 2
 

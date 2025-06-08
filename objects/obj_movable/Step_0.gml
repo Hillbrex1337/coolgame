@@ -87,7 +87,7 @@ if (abs(hmove) > 0) {
 
             var tile_id = tilemap_get_at_pixel(_tilemap, check_x, check_y);
 
-            if (tile_id == 1) {
+            if (tile_id == 1 || tile_id==2) {
                 collision_positions[array_length(collision_positions)] = sweep_y;
             } else {
                 free_positions[array_length(free_positions)] = sweep_y;
@@ -177,7 +177,7 @@ if (abs(vmove) > 0) {
 
             var tile_id = tilemap_get_at_pixel(_tilemap, check_x, check_y);
 
-            if (tile_id == 1) {
+            if (tile_id == 1 || tile_id==2) {
                 collision_positions[array_length(collision_positions)] = sweep_x;
             } else {
                 free_positions[array_length(free_positions)] = sweep_x;
@@ -361,7 +361,7 @@ if (z>0){
 	if (fall_speed_x==0)
 		fall_speed_x=hmove;
 	if(fall_speed_y==0)
-		fall_speed_y = vmove/4;
+		fall_speed_y = vmove/2;
 	
 	if (!jumping){
 		z-=z_speed;

@@ -1,4 +1,6 @@
 /// @description Player Create Event
+
+
 event_inherited(); // falling pshysics
 friction=0.2;
 surf = noone;
