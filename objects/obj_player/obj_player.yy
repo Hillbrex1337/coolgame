@@ -36,7 +36,7 @@
   "properties":[],
   "resourceType":"GMObject",
   "resourceVersion":"2.0",
-  "solid":false,
+  "solid":true,
   "spriteId":{
     "name":"spr_character_idle_right",
     "path":"sprites/spr_character_idle_right/spr_character_idle_right.yy",

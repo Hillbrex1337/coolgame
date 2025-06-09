@@ -560,7 +560,6 @@ if (attacking) {
 
 // Depth sorting
 depth = - (y + sprite_height / 2);
-show_debug_message("depth is " + string(depth));
 // Collision handling before applying movement
 
 
@@ -598,4 +597,47 @@ if (z>0){
 	jumping = false;
 	fall_speed_x= 0;
 	fall_speed_y=0;
+}
+// Safe ground check radius (10 pixels)
+var safe_margin = 10;
+
+// Get the height map layer
+var heightmap = layer_tilemap_get_id("height_map_tiles");
+
+// Check if player is grounded
+var tile_below = tilemap_get_at_pixel(heightmap, x, y + collision_box_bottom + 1);
+
+if (!falling && z == 0 && tile_below > 0) {
+	var is_safe = true;
+
+	// Loop through a 10x10 box around the player's feet
+	for (var yy = -safe_margin; yy <= safe_margin; yy += 5) {
+		for (var xx = -safe_margin; xx <= safe_margin; xx += 5) {
+			var check_x = x + xx;
+			var check_y = y + collision_box_bottom + yy;
+
+			var tile = tilemap_get_at_pixel(heightmap, check_x, check_y);
+
+			if (tile <= 0) {
+				is_safe = false;
+				break;
+			}
+		}
+		if (!is_safe) break;
+	}
+
+	// Update safe respawn point only if completely safe
+	if (is_safe) {
+		respawn_x = x;
+		respawn_y = y;
+	}
+}
+
+
+if (dead_by_falling && !respawn_pending) {
+	respawn_pending = true; // prevent multiple runs
+	show_debug_message("respawning!!!")
+	instance_create_layer(respawn_x, respawn_y, "Player", obj_player);
+	instance_destroy(); // delete the dead one
+	
 }

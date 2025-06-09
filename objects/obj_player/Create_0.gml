@@ -102,3 +102,6 @@ for (var i = array_size - 1; i >= 0; i--) {
     saved_pos_x[i] = x - i * 3;
     saved_pos_y[i] = y;
 }
+
+//respawn and death
+respawn_pending=false;
